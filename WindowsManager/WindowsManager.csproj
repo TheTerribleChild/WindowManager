@@ -60,13 +60,12 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="WindowOperators\MicrosoftWindowOperator.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
+    <PreBuildEvent>xcopy "D:\Dev\Project\CS\WindowsManager\MicrosoftWindowOperator\bin\Debug\MicrosoftWindowOperator.dll" "$(ProjectDir)WindowOperators" /Y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

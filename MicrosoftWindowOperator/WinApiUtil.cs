@@ -67,6 +67,10 @@ namespace MicrosoftWindowOperator
         [DllImport("user32.dll")]
         internal static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool SetWindowPlacement(IntPtr hWnd, [In] ref WINDOWPLACEMENT lpwndpl);
+
         [StructLayout(LayoutKind.Sequential)]
         internal struct FLASHWINFO
         {
@@ -84,7 +88,40 @@ namespace MicrosoftWindowOperator
             public int showCmd;
             public System.Drawing.Point ptMinPosition;
             public System.Drawing.Point ptMaxPosition;
-            public System.Drawing.Rectangle rcNormalPosition;
+            public RECT rcNormalPosition;
+        }
+
+        internal class WindowPlacement
+        {
+            public int length;
+            public int flags;
+            public int showCmd;
+            public System.Drawing.Point ptMinPosition;
+            public System.Drawing.Point ptMaxPosition;
+            public RECT rcNormalPosition;
+
+            internal WindowPlacement(WINDOWPLACEMENT placement)
+            {
+                this.length = placement.length;
+                this.flags = placement.flags;
+                this.showCmd = placement.showCmd;
+                this.ptMinPosition = placement.ptMinPosition;
+                this.ptMaxPosition = placement.ptMaxPosition;
+                this.rcNormalPosition = placement.rcNormalPosition;
+            }
+
+            internal WINDOWPLACEMENT GetStruct()
+            {
+                WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
+                placement.length = this.length;
+                placement.flags = this.flags;
+                placement.showCmd = this.showCmd;
+                placement.ptMinPosition = this.ptMinPosition;
+                placement.ptMaxPosition = this.ptMaxPosition;
+                placement.rcNormalPosition = this.rcNormalPosition;
+
+                return placement;
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
