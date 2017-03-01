@@ -27,30 +27,23 @@ namespace MicrosoftWindowOperator
         {
             foreach (TopLevelWindow window in layoutConfiguration.Reverse())
             {
-                uint pid, foregroundPid;
-                WinApiUtil.GetWindowThreadProcessId((IntPtr)window.ID, out pid);
-                if ((int)pid == Process.GetCurrentProcess().Id)
-                    continue;
-
+                uint foregroundPid;
                 uint foreThread = WinApiUtil.GetWindowThreadProcessId(WinApiUtil.GetForegroundWindow(), out foregroundPid);
                 uint appThread = WinApiUtil.GetCurrentThreadId();
                 WinApiUtil.WINDOWPLACEMENT placement = (window.Placement as WinApiUtil.WindowPlacement).GetStruct();
-                WinApiUtil.FLASHWINFO flashInfo = new WinApiUtil.FLASHWINFO();
-                flashInfo.cbSize = Convert.ToUInt32(Marshal.SizeOf(flashInfo));
-                flashInfo.dwFlags = WinApiUtil.FLASHW_STOP;
-                flashInfo.uCount = UInt32.MaxValue;
-                flashInfo.dwTimeout = 0;
-                flashInfo.hwnd = (IntPtr)window.ID;
 
                 if (foreThread != appThread)
                     WinApiUtil.AttachThreadInput(foreThread, appThread, true);
 
-                WinApiUtil.SetWindowPlacement((IntPtr)window.ID, ref placement);
-                WinApiUtil.SetForegroundWindow((IntPtr)window.ID);
-                WinApiUtil.FlashWindowEx(ref flashInfo);
+                for (int i = 0; i < 10 && !WinApiUtil.SetWindowPlacement((IntPtr)window.ID, ref placement); i++)
+                    Console.WriteLine("Fail to set foreground");
 
+                for (int i = 0; i < 10 && !WinApiUtil.SetForegroundWindow((IntPtr)window.ID); i++)
+                    Console.WriteLine("Fail to set foreground");
+                
                 if (foreThread != appThread)
                     WinApiUtil.AttachThreadInput(foreThread, appThread, false);
+                   
             }
 
             return true;
@@ -63,11 +56,8 @@ namespace MicrosoftWindowOperator
         /// <returns></returns>
         public TopLevelWindow[] GetTopLevelWindow(string[] blacklist)
         {
-
             List<TopLevelWindow> windows = new List<TopLevelWindow>();
-            
             VirtualDesktopManager vdm = new VirtualDesktopManager();
-
             int zIndex = 0;
 
             WinApiUtil.EnumDelegate filter = delegate (IntPtr hWnd, int lParam)
@@ -83,24 +73,17 @@ namespace MicrosoftWindowOperator
                     if (WinApiUtil.IsWindowVisible(hWnd) && string.IsNullOrEmpty(strTitle) == false && vdm.IsWindowOnCurrentVirtualDesktop(hWnd) && WinApiUtil.GetWindowPlacement(hWnd, ref placement))
                     {
                         uint pid = 0;
-                        TopLevelWindow.WindowState windowState = TopLevelWindow.WindowState.NORMAL;
                         WinApiUtil.GetWindowThreadProcessId(hWnd, out pid);
                         Process process = Process.GetProcessById((int)pid);
-                        
-                        switch (placement.showCmd)
+                        if (Process.GetCurrentProcess().Id != (int)pid)
                         {
-                            case 1:
-                                windowState = TopLevelWindow.WindowState.NORMAL;
-                                break;
-                            case 2:
-                                windowState = TopLevelWindow.WindowState.MINIMIZED;
-                                break;
-                            case 3:
-                                windowState = TopLevelWindow.WindowState.MAXIMIZED;
-                                break;
+                            TopLevelWindow w = new TopLevelWindow(process.ToString(), strTitle, (int)hWnd, new WinApiUtil.WindowPlacement(placement), zIndex);
+                            windows.Add(w);
                         }
-                        TopLevelWindow w = new TopLevelWindow(process.ToString(), strTitle, (int)hWnd, new WinApiUtil.WindowPlacement(placement), zIndex, windowState);
-                        windows.Add(w);
+                        else
+                        {
+                            Console.WriteLine("Found myself");
+                        }
                     }
                 }catch(System.Runtime.InteropServices.COMException e)
                 {
