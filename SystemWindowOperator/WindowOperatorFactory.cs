@@ -10,7 +10,7 @@ namespace SystemWindowOperator
 {
     public static class WindowOperatorFactory
     {
-        public static IEnumerable<Type> GetLoadableTypes(this Assembly assembly)
+        private static IEnumerable<Type> GetLoadableTypes(this Assembly assembly)
         {
             // TODO: Argument validation
             try
@@ -29,20 +29,15 @@ namespace SystemWindowOperator
 
             foreach (string dllName in sourcePackDLLs)
             {
-
                 Assembly assembly = Assembly.LoadFrom(dllName);
-                //assembly = typeof(string).Assembly;
 
                 if (assembly == null)
-                {
-                    Console.WriteLine("Invalid dll");
                     continue;
-                }
+
                 foreach (Type type in assembly.GetTypes())
                 {
                     if (typeof(IWindowOperator).IsAssignableFrom(type))
                     {
-                        Console.WriteLine(type.FullName);
                         return Activator.CreateInstance(type) as IWindowOperator;
                     }
                         

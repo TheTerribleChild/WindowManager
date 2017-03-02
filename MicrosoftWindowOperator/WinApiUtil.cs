@@ -71,6 +71,9 @@ namespace MicrosoftWindowOperator
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool SetWindowPlacement(IntPtr hWnd, [In] ref WINDOWPLACEMENT lpwndpl);
 
+        [DllImport("user32.dll")]
+        internal static extern bool AllowSetForegroundWindow(int dwProcessId);
+
         [StructLayout(LayoutKind.Sequential)]
         internal struct FLASHWINFO
         {
@@ -89,39 +92,6 @@ namespace MicrosoftWindowOperator
             public System.Drawing.Point ptMinPosition;
             public System.Drawing.Point ptMaxPosition;
             public RECT rcNormalPosition;
-        }
-
-        internal class WindowPlacement
-        {
-            public int length;
-            public int flags;
-            public int showCmd;
-            public System.Drawing.Point ptMinPosition;
-            public System.Drawing.Point ptMaxPosition;
-            public RECT rcNormalPosition;
-
-            internal WindowPlacement(WINDOWPLACEMENT placement)
-            {
-                this.length = placement.length;
-                this.flags = placement.flags;
-                this.showCmd = placement.showCmd;
-                this.ptMinPosition = placement.ptMinPosition;
-                this.ptMaxPosition = placement.ptMaxPosition;
-                this.rcNormalPosition = placement.rcNormalPosition;
-            }
-
-            internal WINDOWPLACEMENT GetStruct()
-            {
-                WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
-                placement.length = this.length;
-                placement.flags = this.flags;
-                placement.showCmd = this.showCmd;
-                placement.ptMinPosition = this.ptMinPosition;
-                placement.ptMaxPosition = this.ptMaxPosition;
-                placement.rcNormalPosition = this.rcNormalPosition;
-
-                return placement;
-            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -153,6 +123,8 @@ namespace MicrosoftWindowOperator
         public const int SWP_NOSIZE = 0x0001;
         public const int SWP_NOZORDER = 0x0004;
         public const int SWP_SHOWWINDOW = 0x0040;
+
+        public const int API_MAX_RETRY = 10;
 
         //Stop flashing. The system restores the window to its original state. 
         public const UInt32 FLASHW_STOP = 0;

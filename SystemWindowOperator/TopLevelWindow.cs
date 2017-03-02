@@ -9,14 +9,13 @@ namespace SystemWindowOperator
 {
     public class TopLevelWindow
     {
-
         public string ApplicationName { get; private set; }
         public string Title { get; private set; }
         public int ID { get; private set; }
-        public object Placement { get; private set; }
+        public IWindowPlacement Placement { get; private set; }
         public int Z { get; private set; }
 
-        public TopLevelWindow(string applicationName, string title, int id, object placement, int z)
+        public TopLevelWindow(string applicationName, string title, int id, IWindowPlacement placement, int z)
         {
             this.ApplicationName = applicationName;
             this.Title = title;

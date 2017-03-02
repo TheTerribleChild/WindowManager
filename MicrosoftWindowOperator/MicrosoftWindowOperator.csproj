@@ -48,6 +48,7 @@
     <Compile Include="VirtualDesktopOperator.cs" />
     <Compile Include="WinApiUtil.cs" />
     <Compile Include="WindowOperator.cs" />
+    <Compile Include="WindowPlacement.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
