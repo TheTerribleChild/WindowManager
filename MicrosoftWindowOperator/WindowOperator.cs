@@ -37,7 +37,7 @@ namespace MicrosoftWindowOperator
             {
                 foreach (TopLevelWindow window in sortedLayoutConfiguration)
                 {
-                    WinApiUtil.WINDOWPLACEMENT placement = (window.Placement as WindowPlacement).Placement;
+                    WinApiUtil.WINDOWPLACEMENT placement = (window.Placement as MicrosoftWindowPlacement).Placement;
 
                     if(!WinApiUtil.SetWindowPlacement((IntPtr)window.ID, ref placement))
                     {
@@ -91,9 +91,8 @@ namespace MicrosoftWindowOperator
         /// <summary>
         /// Get the current layout of the windows.
         /// </summary>
-        /// <param name="blacklist">specify which application to block from reading</param>
         /// <returns>Returns a list of current TopLevelWindow</returns>
-        public TopLevelWindow[] GetTopLevelWindow(string[] blacklist)
+        public TopLevelWindow[] GetTopLevelWindow()
         {
             List<TopLevelWindow> windows = new List<TopLevelWindow>();
             VirtualDesktopManager vdm = new VirtualDesktopManager();
@@ -113,8 +112,9 @@ namespace MicrosoftWindowOperator
                         uint pid = 0;
                         WinApiUtil.GetWindowThreadProcessId(hWnd, out pid);
                         Process process = Process.GetProcessById((int)pid);
-                        TopLevelWindow w = new TopLevelWindow(process.ToString(), strTitle, (int)hWnd, new WindowPlacement(placement), zIndex);
+                        TopLevelWindow w = new TopLevelWindow(process.ProcessName, strTitle, (int)hWnd, new MicrosoftWindowPlacement(placement), zIndex);
                         windows.Add(w);
+                        zIndex++;
                     }
                 }catch(System.Runtime.InteropServices.COMException e)
                 {
@@ -122,7 +122,7 @@ namespace MicrosoftWindowOperator
                 {
                     Console.Error.WriteLine(e);
                 }
-                zIndex++;
+                
                 return true;
             };
 

@@ -7,11 +7,11 @@ using SystemWindowOperator;
 
 namespace MicrosoftWindowOperator
 {
-    public class WindowPlacement : SystemWindowOperator.IWindowPlacement
+    public class MicrosoftWindowPlacement : SystemWindowOperator.WindowPlacement
     {
         internal WinApiUtil.WINDOWPLACEMENT Placement { get; }
 
-        public int X
+        public override int X
         {
             get
             {
@@ -19,7 +19,7 @@ namespace MicrosoftWindowOperator
             }
         }
 
-        public int Y
+        public override int Y
         {
             get
             {
@@ -27,7 +27,7 @@ namespace MicrosoftWindowOperator
             }
         }
 
-        public int Width
+        public override int Width
         {
             get
             {
@@ -35,7 +35,7 @@ namespace MicrosoftWindowOperator
             }
         }
 
-        public int Height
+        public override int Height
         {
             get
             {
@@ -43,7 +43,7 @@ namespace MicrosoftWindowOperator
             }
         }
 
-        public WindowPlacementState WindowState
+        public override WindowPlacementState WindowState
         {
             get
             {
@@ -60,7 +60,7 @@ namespace MicrosoftWindowOperator
             }
         }
 
-        internal WindowPlacement(WinApiUtil.WINDOWPLACEMENT placement)
+        internal MicrosoftWindowPlacement(WinApiUtil.WINDOWPLACEMENT placement)
         {
             this.Placement = placement;
         }

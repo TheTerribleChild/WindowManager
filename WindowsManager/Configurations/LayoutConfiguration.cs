@@ -8,37 +8,48 @@ namespace WindowsManager.Configurations
 {
     internal class LayoutConfiguration
     {
-        internal Dictionary<string, int> Configuration { get; private set; }
+        internal List<int> Configuration { get; private set; }
+        internal HashSet<int> FastMatchingSet { get; private set; }
         internal int ScreenSettingId { get; private set; }
 
         internal LayoutConfiguration(WindowConfiguration[] windowConfigurations, int screenSettingId)
         {
-            this.Configuration = new Dictionary<string, int>();
+            this.Configuration = new List<int>();
             this.ScreenSettingId = screenSettingId;
+            string[] appName = new string[windowConfigurations.Length];
+            for (int i = 0; i < windowConfigurations.Length; i++)
+                appName[i] = windowConfigurations[i].ApplicationName;
 
-            foreach (WindowConfiguration configuration in windowConfigurations)
-                this.Configuration[configuration.ProcessName] = configuration.Key;
+            this.FastMatchingSet = LayoutConfiguration.GetFastApplicationMatchingSet(appName);
 
         }
 
-        internal bool Contains(string process)
+        internal bool ContainsAll(HashSet<int> processes)
         {
-            return Configuration.ContainsKey(process);
+            return FastMatchingSet.IsSupersetOf(processes);
         }
 
-        internal bool ContainsAll(string[] processes)
+        internal static HashSet<int> GetFastApplicationMatchingSet(string[] applicationName)
         {
-            foreach(string processName in processes)
+            HashSet<int> hashSet = new HashSet<int>();
+            Dictionary<int, int> counter = new Dictionary<int, int>();
+            int hash = 0;
+            foreach (string app in applicationName)
             {
-                if (!Configuration.ContainsKey(processName))
-                    return false;
+                hash = app.GetHashCode();
+                if (counter.ContainsKey(hash))
+                    counter[hash]++;
+                else
+                    counter[hash] = 1;
+                hashSet.Add(String.Format("{0}{1}", app, counter[hash]).GetHashCode());
             }
-            return true;
+
+            return hashSet;
         }
     }
 
     internal static class LayoutConfigurationFactory
     {
-
+        
     }
 }

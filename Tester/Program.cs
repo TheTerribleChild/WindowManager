@@ -14,7 +14,7 @@ namespace Tester
             Console.WriteLine("OSVersion: {0}", Environment.OSVersion);
             IWindowOperator swo = WindowOperatorFactory.CreateWindowOperator();
             string[] array = new string[10];
-            TopLevelWindow[] windows = swo.GetTopLevelWindow(array);
+            TopLevelWindow[] windows = swo.GetTopLevelWindow();
             foreach(TopLevelWindow tlw in windows)
             {
                 Console.WriteLine(tlw.ToString());
@@ -22,7 +22,7 @@ namespace Tester
             Console.ReadKey();
 
             Console.WriteLine("\n\nBefore moving\n");
-            TopLevelWindow[] beforewindows = swo.GetTopLevelWindow(array);
+            TopLevelWindow[] beforewindows = swo.GetTopLevelWindow();
             foreach (TopLevelWindow tlw in beforewindows)
             {
                 Console.WriteLine(tlw.ToString());
@@ -31,7 +31,7 @@ namespace Tester
             swo.ApplyLayoutConfiguration(windows);
 
             Console.WriteLine("\n\nAfter moving\n");
-            TopLevelWindow[] afterwindows = swo.GetTopLevelWindow(array);
+            TopLevelWindow[] afterwindows = swo.GetTopLevelWindow();
             foreach (TopLevelWindow tlw in afterwindows)
             {
                 Console.WriteLine(tlw.ToString());

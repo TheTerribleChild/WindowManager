@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IWindowOperator.cs" />
-    <Compile Include="IWindowPlacement.cs" />
+    <Compile Include="WindowPlacement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TopLevelWindow.cs" />
     <Compile Include="WindowOperatorFactory.cs" />

@@ -8,7 +8,7 @@ namespace SystemWindowOperator
 {
     public interface IWindowOperator
     {
-        TopLevelWindow[] GetTopLevelWindow(string[] blacklist);
+        TopLevelWindow[] GetTopLevelWindow();
         bool ApplyLayoutConfiguration(TopLevelWindow[] layoutConfiguration);
 
     }
