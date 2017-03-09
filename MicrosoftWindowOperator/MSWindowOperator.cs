@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -11,19 +10,15 @@ using SystemWindowOperator;
 
 namespace MicrosoftWindowOperator
 {
-    public class WindowOperator : IWindowOperator
+    class MSWindowOperator
     {
-        /// <summary>
-        /// Used to restore the current window layout to the state specified in the parameter.
-        /// </summary>
-        /// <param name="layoutConfiguration"></param>
-        /// <returns>Return whether the call was successful or not</returns>
-        public bool ApplyLayoutConfiguration(TopLevelWindow[] windowsLayout)
+        public bool ApplyLayoutConfiguration(MappedLayout mappedLayout)
         {
-            if (windowsLayout.Length == 0)
+            if (mappedLayout.Mapping.Count == 0)
                 return false;
 
-            TopLevelWindow[] sortedLayoutConfiguration = (from window in windowsLayout orderby window.Z descending select window).ToArray<TopLevelWindow>();
+            mappedLayout.SortByZ();
+
             bool successful = true;
             uint foregroundPid;
             uint foreThread = WinApiUtil.GetWindowThreadProcessId(WinApiUtil.GetForegroundWindow(), out foregroundPid);
@@ -35,14 +30,18 @@ namespace MicrosoftWindowOperator
 
             try
             {
-                foreach (TopLevelWindow window in sortedLayoutConfiguration)
+                foreach (MappedWindow window in mappedLayout.Mapping)
                 {
-                    WinApiUtil.WINDOWPLACEMENT placement = (window.Placement as MSWindowPlacement).Placement;
+                    WinApiUtil.WINDOWPLACEMENT placement = (window.Configuration.Placement as MSWindowPlacement).Placement;
+                    IntPtr handle = (IntPtr)window.Handle;
 
-                    if(!WinApiUtil.SetWindowPlacement((IntPtr)window.WindowHandle, ref placement))
+                    if (WinApiUtil.IsWindowVisible(handle))
+                        continue;
+
+                    if (!WinApiUtil.SetWindowPlacement(handle, ref placement))
                     {
                         int retries;
-                        for (retries = 0; retries < WinApiUtil.API_MAX_RETRY && !WinApiUtil.SetWindowPlacement((IntPtr)window.WindowHandle, ref placement); retries++)
+                        for (retries = 0; retries < WinApiUtil.API_MAX_RETRY && !WinApiUtil.SetWindowPlacement(handle, ref placement); retries++)
                             Thread.Sleep(10);
 
                         if (retries == WinApiUtil.API_MAX_RETRY)
@@ -53,10 +52,10 @@ namespace MicrosoftWindowOperator
                     }
 
                     //If window is minimized, no need to bring it to foreground.
-                    if (window.Placement.WindowState != WindowPlacementState.Minimized && !WinApiUtil.SetForegroundWindow((IntPtr)window.WindowHandle))
+                    if (window.Configuration.Placement.WindowState != WindowPlacementState.Minimized && !WinApiUtil.SetForegroundWindow(handle))
                     {
                         int retries;
-                        for (retries = 0; retries < WinApiUtil.API_MAX_RETRY && !WinApiUtil.SetForegroundWindow((IntPtr)window.WindowHandle); retries++)
+                        for (retries = 0; retries < WinApiUtil.API_MAX_RETRY && !WinApiUtil.SetForegroundWindow(handle); retries++)
                             Thread.Sleep(10);
 
                         if (retries == WinApiUtil.API_MAX_RETRY)
@@ -67,7 +66,7 @@ namespace MicrosoftWindowOperator
                             flashInfo.dwFlags = WinApiUtil.FLASHW_STOP;
                             flashInfo.uCount = 0;
                             flashInfo.dwTimeout = 0;
-                            flashInfo.hwnd = (IntPtr)window.WindowHandle;
+                            flashInfo.hwnd = handle;
                             WinApiUtil.FlashWindowEx(ref flashInfo);
 
                             Console.Error.WriteLine("Failed to set foreground: " + window);
@@ -76,7 +75,8 @@ namespace MicrosoftWindowOperator
 
                     Thread.Sleep(10);
                 }
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Console.Error.WriteLine(e);
                 successful = false;
@@ -92,9 +92,9 @@ namespace MicrosoftWindowOperator
         /// Get the current layout of the windows.
         /// </summary>
         /// <returns>Returns a list of current TopLevelWindow</returns>
-        public TopLevelWindow[] GetTopLevelWindow()
+        public MappedLayout GetTopLevelWindow()
         {
-            List<TopLevelWindow> windows = new List<TopLevelWindow>();
+            MappedLayout mapping = new MappedLayout();
             VirtualDesktopManager vdm = new VirtualDesktopManager();
             int zIndex = 0;
 
@@ -113,21 +113,23 @@ namespace MicrosoftWindowOperator
                         WinApiUtil.GetWindowThreadProcessId(hWnd, out pid);
                         Process process = Process.GetProcessById((int)pid);
                         TopLevelWindow w = new TopLevelWindow(process.ProcessName, strTitle, (int)hWnd, new MSWindowPlacement(placement), zIndex);
-                        windows.Add(w);
+                        mapping.AddMapping(hWnd, new WindowConfiguration(process.ProcessName, new MSWindowPlacement(placement), zIndex), strTitle);
                         zIndex++;
                     }
-                }catch(System.Runtime.InteropServices.COMException e)
+                }
+                catch (System.Runtime.InteropServices.COMException e)
                 {
-                }catch(Exception e)
+                }
+                catch (Exception e)
                 {
                     Console.Error.WriteLine(e);
                 }
-                
+
                 return true;
             };
 
             if (WinApiUtil.EnumDesktopWindows(IntPtr.Zero, filter, IntPtr.Zero))
-                return windows.ToArray<TopLevelWindow>();
+                return mapping;
 
             return null;
         }

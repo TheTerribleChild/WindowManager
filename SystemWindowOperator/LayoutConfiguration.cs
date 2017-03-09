@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WindowsManager.Configurations
+namespace SystemWindowOperator
 {
-    public class LayoutConfiguration
+    public abstract class LayoutConfiguration
     {
         public WindowConfiguration[] WindowConfigurations { get; private set; }
         public HashSet<int> FastMatchingSet { get; private set; }
@@ -50,10 +50,5 @@ namespace WindowsManager.Configurations
 
             return hashSet;
         }
-    }
-
-    internal static class LayoutConfigurationFactory
-    {
-        
     }
 }

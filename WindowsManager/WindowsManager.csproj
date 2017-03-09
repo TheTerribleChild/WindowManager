@@ -43,6 +43,9 @@
     <Reference Include="SystemWindowOperator">
       <HintPath>..\SystemWindowOperator\bin\Debug\SystemWindowOperator.dll</HintPath>
     </Reference>
+    <Reference Include="Utility">
+      <HintPath>..\..\Utility\Utility\bin\Debug\Utility.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configurations\LayoutConfiguration.cs" />
@@ -52,12 +55,23 @@
     <Compile Include="Configurations\UserConfiguration.cs" />
     <Compile Include="Configurations\WindowConfigurationManager.cs" />
     <Compile Include="ProcessManager.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="SessionHwndToConfigurationMapper.cs" />
     <Compile Include="Configurations\WindowConfiguration.cs" />
     <Compile Include="WindowManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="WindowOperators\MicrosoftWindowOperator.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

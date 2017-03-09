@@ -7,32 +7,22 @@ using System.Drawing;
 
 namespace SystemWindowOperator
 {
-    public class TopLevelWindow
+    public class TopLevelWindow : WindowInfo
     {
-        public string ApplicationName { get; private set; }
         public string Title { get; private set; }
-        public int ID { get; private set; }
-        public WindowPlacement Placement { get; private set; }
-        public int Z { get; private set; }
+        public int WindowHandle { get; private set; }
 
-        public TopLevelWindow(string applicationName, string title, int id, WindowPlacement placement, int z)
+        public TopLevelWindow(string applicationName, string title, int whnd, WindowPlacement placement, int z) : base(applicationName, placement, z)
         {
-            this.ApplicationName = applicationName;
             this.Title = title;
-            this.ID = id;
-            this.Placement = placement;
-            this.Z = z;
+            this.WindowHandle = whnd;
         }
 
         public override string ToString()
         {
-            return ApplicationName + "|" + Title + "|" + ID + "|" + "|" + Z;
+            return ApplicationName + "|" + Title + "|" + WindowHandle + "|" + Z;
         }
 
-        public void SetZ(int Z)
-        {
-            if (Z >= 0)
-                this.Z = Z;
-        }
+        
     }
 }

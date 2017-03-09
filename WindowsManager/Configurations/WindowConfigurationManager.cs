@@ -20,5 +20,32 @@ namespace WindowsManager.Configurations
             }
         }
 
+        internal static string WINDOW_CONFIGURATION_LOCATION
+        {
+            get
+            {
+                return Properties.Settings.Default["WorkingDirectory"] + "Windows.json";
+            }
+        }
+
+        public Dictionary<int, WindowConfiguration> WindowConfigurations { get; private set; }
+
+        private WindowConfigurationManager()
+        {
+            this.WindowConfigurations = new Dictionary<int, WindowConfiguration>();
+        }
+
+        public static void Save()
+        {
+            if (instance != null)
+                Utility.SerializeUtility.SerializeToJsonFile(Instance.WindowConfigurations, WINDOW_CONFIGURATION_LOCATION);
+        }
+
+        public static bool Load()
+        {
+            Instance.WindowConfigurations = Utility.SerializeUtility.DeserializeJsonFile<Dictionary<int, WindowConfiguration>>(WINDOW_CONFIGURATION_LOCATION);
+            return Instance.WindowConfigurations != default(Dictionary<int, WindowConfiguration>);
+        }
+
     }
 }

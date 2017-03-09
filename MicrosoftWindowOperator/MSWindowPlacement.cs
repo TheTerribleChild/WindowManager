@@ -7,9 +7,9 @@ using SystemWindowOperator;
 
 namespace MicrosoftWindowOperator
 {
-    public class MicrosoftWindowPlacement : SystemWindowOperator.WindowPlacement
+    public class MSWindowPlacement : SystemWindowOperator.WindowPlacement
     {
-        internal WinApiUtil.WINDOWPLACEMENT Placement { get; }
+        public WinApiUtil.WINDOWPLACEMENT Placement { get; }
 
         public override int X
         {
@@ -60,7 +60,7 @@ namespace MicrosoftWindowOperator
             }
         }
 
-        internal MicrosoftWindowPlacement(WinApiUtil.WINDOWPLACEMENT placement)
+        internal MSWindowPlacement(WinApiUtil.WINDOWPLACEMENT placement)
         {
             this.Placement = placement;
         }

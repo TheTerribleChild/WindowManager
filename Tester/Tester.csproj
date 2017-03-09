@@ -78,6 +78,10 @@
       <Project>{46047221-9539-4c8d-aa2c-09c90975e643}</Project>
       <Name>SystemWindowOperator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WindowsManager\WindowsManager.csproj">
+      <Project>{c7cd5276-b452-4c01-b2bf-a71417b31b3c}</Project>
+      <Name>WindowsManager</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

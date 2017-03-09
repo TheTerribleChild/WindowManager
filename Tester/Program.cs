@@ -11,6 +11,7 @@ namespace Tester
     {
         static void Main(string[] args)
         {
+            /*
             Console.WriteLine("OSVersion: {0}", Environment.OSVersion);
             IWindowOperator swo = WindowOperatorFactory.CreateWindowOperator();
             string[] array = new string[10];
@@ -36,6 +37,8 @@ namespace Tester
             {
                 Console.WriteLine(tlw.ToString());
             }
+            */
+            WindowsManager.WindowManager.Instance.Test();
         }
     }
 }

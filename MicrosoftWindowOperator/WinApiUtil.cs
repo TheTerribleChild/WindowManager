@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MicrosoftWindowOperator
 {
-    internal static class WinApiUtil
+    public static class WinApiUtil
     {
         internal delegate bool EnumDelegate(IntPtr hWnd, int lParam);
 
@@ -84,7 +84,7 @@ namespace MicrosoftWindowOperator
             public UInt32 dwTimeout;
         }
 
-        internal struct WINDOWPLACEMENT
+        public struct WINDOWPLACEMENT
         {
             public int length;
             public int flags;
@@ -95,7 +95,7 @@ namespace MicrosoftWindowOperator
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        internal struct RECT
+        public struct RECT
         {
             public int Left;
             public int Top;

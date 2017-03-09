@@ -10,6 +10,5 @@ namespace SystemWindowOperator
     {
         TopLevelWindow[] GetTopLevelWindow();
         bool ApplyLayoutConfiguration(TopLevelWindow[] layoutConfiguration);
-
     }
 }

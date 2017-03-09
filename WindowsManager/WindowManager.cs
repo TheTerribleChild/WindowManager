@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using SystemWindowOperator;
 
@@ -12,7 +14,7 @@ namespace WindowsManager
         private static WindowManager instance;
         private IWindowOperator windowOperator;
         private Configurations.WindowConfigurationManager windowConfigManager;
-        private Configurations.LayoutConfigurationManager layoutManager;
+        private Configurations.LayoutConfigurationManager layoutConfigManager; 
 
         public static WindowManager Instance
         {
@@ -28,7 +30,25 @@ namespace WindowsManager
         {
             windowOperator = WindowOperatorFactory.CreateWindowOperator();
             windowConfigManager = Configurations.WindowConfigurationManager.Instance;
-            layoutManager = Configurations.LayoutConfigurationManager.Instance;
+            layoutConfigManager = Configurations.LayoutConfigurationManager.Instance;
+        }
+
+        public void Test()
+        {
+            LoadConfigurationFromFile();
+            TopLevelWindow[] windows = GetFilteredWindows();
+            Configurations.LayoutConfiguration layoutConfig = new Configurations.LayoutConfiguration(GetWindowConfiguration(GetFilteredWindows()), 0);
+            Configurations.LayoutConfigurationManager.AddLayout(layoutConfig);
+            SaveConfigurationToFile();
+        }
+
+        private Configurations.WindowConfiguration[] GetWindowConfiguration(TopLevelWindow[] windows)
+        {
+            Configurations.WindowConfiguration[] windowConfigs = new Configurations.WindowConfiguration[windows.Length];
+            for(int i = 0; i < windows.Length; i++)
+                windowConfigs[i] = new Configurations.WindowConfiguration(windows[i] as WindowInfo);
+
+            return windowConfigs;
         }
 
         private Configurations.LayoutConfiguration GetCurrentLayoutConfiguration()
@@ -63,6 +83,28 @@ namespace WindowsManager
         {
             //Fill with blacklist logic later.
             return false;
+        }
+
+        private void SaveConfigurationToFile()
+        {
+            new Thread(delegate () {
+
+                if (!Directory.Exists(Properties.Settings.Default["WorkingDirectory"].ToString()))
+                    Directory.CreateDirectory(Properties.Settings.Default["WorkingDirectory"].ToString());
+
+                Configurations.WindowConfigurationManager.Save();
+                Configurations.LayoutConfigurationManager.Save();
+            }).Start();
+        }
+
+        private bool LoadConfigurationFromFile()
+        {
+            if (!Directory.Exists(Properties.Settings.Default["WorkingDirectory"].ToString()))
+                return false;
+
+            Configurations.WindowConfigurationManager.Load();
+            Configurations.LayoutConfigurationManager.Load();
+            return true;
         }
     }
 }

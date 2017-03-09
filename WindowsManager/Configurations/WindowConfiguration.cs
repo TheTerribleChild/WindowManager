@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace WindowsManager.Configurations
 {
-    internal class WindowConfiguration
+    public class WindowConfiguration
     {
-        internal TopLevelWindow Window { get; private set; }
-        internal string ApplicationName
+        public WindowInfo Window { get; private set; }
+        public string ApplicationName
         {
             get
             {
@@ -19,23 +19,36 @@ namespace WindowsManager.Configurations
             }
         }
 
-        internal int Key { get; private set; }
-        internal List<int> TitleHistory { get; private set; }
+        public int Key {
+            get
+            {
+                return Window.ArchiveID;
+            }
+        }
 
-        internal WindowConfiguration(TopLevelWindow window)
+        public WindowPlacement Placement
         {
-            this.Window = window;
-            this.Key = String.Format("{0}{1}", window.Title, window.Placement.GetHashCode()).GetHashCode();
+            get
+            {
+                return Window.Placement;
+            }
+        }
+
+        public List<int> TitleHistory { get; private set; }
+
+        public WindowConfiguration(WindowInfo window)
+        {
+            this.Window = new WindowInfo(window.ApplicationName, window.Placement, window.Z);
             this.TitleHistory = new List<int>();
         }
 
-        internal void AddTitleToHistory(string windowTitle)
+        public void AddTitleToHistory(string windowTitle)
         {
             TitleHistory.Add(windowTitle.GetHashCode());
         }
     }
 
-    internal static class WindowConfigurationFactory
+    public static class WindowConfigurationFactory
     {
 
     }
