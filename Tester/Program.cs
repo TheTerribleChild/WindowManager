@@ -38,7 +38,33 @@ namespace Tester
                 Console.WriteLine(tlw.ToString());
             }
             */
-            WindowsManager.WindowManager.Instance.Test();
+            //WindowsManager.WindowManager.Instance.Test();
+
+            IWindowOperator swo = WindowOperatorActivator.CreateWindowOperator();
+            MappedLayout layout = swo.GetCurrentMappedLayout();
+            foreach (MappedWindow tlw in layout.Mapping)
+            {
+                Console.WriteLine(tlw.Configuration.ToString()+"|"+tlw.Handle);
+            }
+            
+            //Console.ReadKey();
+            //swo.ApplyMappedLayout(layout);
+            /*
+            Console.WriteLine("\n\nBefore moving\n");
+            MappedLayout layout2 = swo.GetCurrentMappedLayout();
+            foreach (MappedWindow tlw in layout2.Mapping)
+            {
+                Console.WriteLine(tlw.Configuration.ToString() + "|" + tlw.Handle);
+            }
+
+            swo.ApplyMappedLayout(layout);
+            Console.WriteLine("\n\nAfter\n");
+            MappedLayout layout3 = swo.GetCurrentMappedLayout();
+            foreach (MappedWindow tlw in layout3.Mapping)
+            {
+                Console.WriteLine(tlw.Configuration.ToString() + "|" + tlw.Handle);
+            }
+            */
         }
     }
 }

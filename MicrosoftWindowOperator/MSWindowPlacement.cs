@@ -15,7 +15,7 @@ namespace MicrosoftWindowOperator
         {
             get
             {
-                return Placement.ptMinPosition.X;
+                return Placement.rcNormalPosition.Left;
             }
         }
 
@@ -23,7 +23,7 @@ namespace MicrosoftWindowOperator
         {
             get
             {
-                return Placement.ptMinPosition.Y;
+                return Placement.rcNormalPosition.Top;
             }
         }
 
@@ -31,7 +31,7 @@ namespace MicrosoftWindowOperator
         {
             get
             {
-                return Placement.ptMaxPosition.X - Placement.ptMinPosition.X;
+                return Placement.rcNormalPosition.Right - Placement.rcNormalPosition.Left;
             }
         }
 
@@ -39,7 +39,7 @@ namespace MicrosoftWindowOperator
         {
             get
             {
-                return Placement.ptMaxPosition.Y - Placement.ptMinPosition.Y;
+                return Placement.rcNormalPosition.Bottom - Placement.rcNormalPosition.Top;
             }
         }
 
@@ -63,6 +63,11 @@ namespace MicrosoftWindowOperator
         internal MSWindowPlacement(WinApiUtil.WINDOWPLACEMENT placement)
         {
             this.Placement = placement;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("({0}, {1}, {2}, {3}, {4}, {5})", X, Y, Width, Height, WindowState, Placement.showCmd);
         }
     }
 }

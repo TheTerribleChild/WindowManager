@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SystemWindowOperator
 {
-    public static class WindowOperatorFactory
+    public static class WindowOperatorActivator
     {
         private static IEnumerable<Type> GetLoadableTypes(this Assembly assembly)
         {
@@ -23,7 +23,7 @@ namespace SystemWindowOperator
             }
         }
 
-        public static IWindowOperator CreateWindowOperator()
+        public static object CreateType<T>()
         {
             string[] sourcePackDLLs = Directory.GetFiles(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "WindowOperators"), "*.dll");
 
@@ -36,14 +36,19 @@ namespace SystemWindowOperator
 
                 foreach (Type type in assembly.GetTypes())
                 {
-                    if (typeof(IWindowOperator).IsAssignableFrom(type))
+                    if (typeof(T).IsAssignableFrom(type))
                     {
-                        return Activator.CreateInstance(type) as IWindowOperator;
+                        return Activator.CreateInstance(type);
                     }
                         
                 }
             }
-            return null;
+            return default(T);
+        }
+
+        public static IWindowOperator CreateWindowOperator()
+        {
+            return CreateType<IWindowOperator>() as IWindowOperator;
         }
     }
 }

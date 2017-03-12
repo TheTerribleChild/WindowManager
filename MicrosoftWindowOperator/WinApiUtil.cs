@@ -74,6 +74,15 @@ namespace MicrosoftWindowOperator
         [DllImport("user32.dll")]
         internal static extern bool AllowSetForegroundWindow(int dwProcessId);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("User32.dll")]
+        internal static extern Int64 SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("dwmapi.dll")]
+        internal static extern int DwmGetWindowAttribute(IntPtr hwnd, int dwAttribute, out int pvAttribute, int cbAttribute);
+
         [StructLayout(LayoutKind.Sequential)]
         internal struct FLASHWINFO
         {
@@ -103,10 +112,33 @@ namespace MicrosoftWindowOperator
             public int Bottom;
         }
 
+        [Flags]
+        internal enum DwmWindowAttribute : uint
+        {
+            DWMWA_NCRENDERING_ENABLED = 1,
+            DWMWA_NCRENDERING_POLICY,
+            DWMWA_TRANSITIONS_FORCEDISABLED,
+            DWMWA_ALLOW_NCPAINT,
+            DWMWA_CAPTION_BUTTON_BOUNDS,
+            DWMWA_NONCLIENT_RTL_LAYOUT,
+            DWMWA_FORCE_ICONIC_REPRESENTATION,
+            DWMWA_FLIP3D_POLICY,
+            DWMWA_EXTENDED_FRAME_BOUNDS,
+            DWMWA_HAS_ICONIC_BITMAP,
+            DWMWA_DISALLOW_PEEK,
+            DWMWA_EXCLUDED_FROM_PEEK,
+            DWMWA_CLOAK,
+            DWMWA_CLOAKED,
+            DWMWA_FREEZE_REPRESENTATION,
+            DWMWA_LAST
+        }
+
         internal const int HWND_TOP = 0;
         internal const int HWND_BOTTOM = 1;
         internal const int HWND_TOPMOST = -1;
         internal const int HWND_NOTOPMOST = -2;
+
+        internal const int WmPaint = 0x000F;
 
         public const int SWP_ASYNCWINDOWPOS = 0x4000;
         public const int SWP_DEFERERASE = 0x2000;
@@ -139,5 +171,29 @@ namespace MicrosoftWindowOperator
         public const UInt32 FLASHW_TIMER = 4;
         //Flash continuously until the window comes to the foreground. 
         public const UInt32 FLASHW_TIMERNOFG = 12;
+
+        public const UInt32 WS_OVERLAPPED = 0;
+        public const UInt32 WS_POPUP = 0x80000000;
+        public const UInt32 WS_CHILD = 0x40000000;
+        public const UInt32 WS_MINIMIZE = 0x20000000;
+        public const UInt32 WS_VISIBLE = 0x10000000;
+        public const UInt32 WS_DISABLED = 0x8000000;
+        public const UInt32 WS_CLIPSIBLINGS = 0x4000000;
+        public const UInt32 WS_CLIPCHILDREN = 0x2000000;
+        public const UInt32 WS_MAXIMIZE = 0x1000000;
+        public const UInt32 WS_CAPTION = 0xC00000;      // WS_BORDER or WS_DLGFRAME  
+        public const UInt32 WS_BORDER = 0x800000;
+        public const UInt32 WS_DLGFRAME = 0x400000;
+        public const UInt32 WS_VSCROLL = 0x200000;
+        public const UInt32 WS_HSCROLL = 0x100000;
+        public const UInt32 WS_SYSMENU = 0x80000;
+        public const UInt32 WS_THICKFRAME = 0x40000;
+        public const UInt32 WS_GROUP = 0x20000;
+        public const UInt32 WS_TABSTOP = 0x10000;
+        public const UInt32 WS_MINIMIZEBOX = 0x20000;
+        public const UInt32 WS_MAXIMIZEBOX = 0x10000;
+        public const UInt32 WS_TILED = WS_OVERLAPPED;
+        public const UInt32 WS_ICONIC = WS_MINIMIZE;
+        public const UInt32 WS_SIZEBOX = WS_THICKFRAME;
     }
 }

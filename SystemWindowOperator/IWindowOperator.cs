@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace SystemWindowOperator
 {
+
     public interface IWindowOperator
     {
-        TopLevelWindow[] GetTopLevelWindow();
-        bool ApplyLayoutConfiguration(TopLevelWindow[] layoutConfiguration);
+        bool ApplyMappedLayout(MappedLayout mappedLayout);
+        MappedLayout GetCurrentMappedLayout();
     }
 }

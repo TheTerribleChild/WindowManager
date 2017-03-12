@@ -28,7 +28,7 @@ namespace WindowsManager
 
         private WindowManager()
         {
-            windowOperator = WindowOperatorFactory.CreateWindowOperator();
+            //windowOperator = WindowOperatorFactory.CreateWindowOperator();
             windowConfigManager = Configurations.WindowConfigurationManager.Instance;
             layoutConfigManager = Configurations.LayoutConfigurationManager.Instance;
         }
@@ -64,6 +64,7 @@ namespace WindowsManager
 
         private TopLevelWindow[] GetFilteredWindows()
         {
+            /*
             TopLevelWindow[] windows = windowOperator.GetTopLevelWindow();
             List<TopLevelWindow> savedWindows = new List<TopLevelWindow>();
             int zIndex = 0;
@@ -77,6 +78,8 @@ namespace WindowsManager
             }
 
             return savedWindows.ToArray();
+            */
+            return null;
         }
 
         private bool IsBlacklisted(TopLevelWindow window)

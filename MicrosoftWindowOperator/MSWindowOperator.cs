@@ -7,12 +7,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SystemWindowOperator;
+using System.Management;
 
 namespace MicrosoftWindowOperator
 {
-    class MSWindowOperator
+    class MSWindowOperator : IWindowOperator
     {
-        public bool ApplyLayoutConfiguration(MappedLayout mappedLayout)
+        public bool ApplyMappedLayout(MappedLayout mappedLayout)
         {
             if (mappedLayout.Mapping.Count == 0)
                 return false;
@@ -30,12 +31,13 @@ namespace MicrosoftWindowOperator
 
             try
             {
-                foreach (MappedWindow window in mappedLayout.Mapping)
+                foreach (MappedWindow window in mappedLayout.Mapping.Reverse<MappedWindow>())
                 {
+                    Console.WriteLine(window.Configuration.ApplicationName);
                     WinApiUtil.WINDOWPLACEMENT placement = (window.Configuration.Placement as MSWindowPlacement).Placement;
                     IntPtr handle = (IntPtr)window.Handle;
 
-                    if (WinApiUtil.IsWindowVisible(handle))
+                    if (!WinApiUtil.IsWindowVisible(handle))
                         continue;
 
                     if (!WinApiUtil.SetWindowPlacement(handle, ref placement))
@@ -46,12 +48,14 @@ namespace MicrosoftWindowOperator
 
                         if (retries == WinApiUtil.API_MAX_RETRY)
                         {
-                            Console.Error.WriteLine("Failed to set placement: " + window);
+                            Console.Error.WriteLine("Failed to set placement: " + window.Configuration.ApplicationName);
                             continue;
                         }
                     }
 
                     //If window is minimized, no need to bring it to foreground.
+                    //do
+                    //{
                     if (window.Configuration.Placement.WindowState != WindowPlacementState.Minimized && !WinApiUtil.SetForegroundWindow(handle))
                     {
                         int retries;
@@ -72,8 +76,10 @@ namespace MicrosoftWindowOperator
                             Console.Error.WriteLine("Failed to set foreground: " + window);
                         }
                     }
-
-                    Thread.Sleep(10);
+                    //} while (!IsHandleInForeground(handle));
+                    
+                    //WinApiUtil.SendMessage(handle, WinApiUtil.WmPaint, IntPtr.Zero, IntPtr.Zero);
+                    Thread.Sleep(50);
                 }
             }
             catch (Exception e)
@@ -92,7 +98,7 @@ namespace MicrosoftWindowOperator
         /// Get the current layout of the windows.
         /// </summary>
         /// <returns>Returns a list of current TopLevelWindow</returns>
-        public MappedLayout GetTopLevelWindow()
+        public MappedLayout GetCurrentMappedLayout()
         {
             MappedLayout mapping = new MappedLayout();
             VirtualDesktopManager vdm = new VirtualDesktopManager();
@@ -107,11 +113,13 @@ namespace MicrosoftWindowOperator
 
                 try
                 {
-                    if (WinApiUtil.IsWindowVisible(hWnd) && string.IsNullOrEmpty(strTitle) == false && vdm.IsWindowOnCurrentVirtualDesktop(hWnd) && WinApiUtil.GetWindowPlacement(hWnd, ref placement))
+
+                    if (WinApiUtil.IsWindowVisible(hWnd) && string.IsNullOrEmpty(strTitle) == false && vdm.IsWindowOnCurrentVirtualDesktop(hWnd) && WinApiUtil.GetWindowPlacement(hWnd, ref placement) && !IsInvisibleWin10BackgroundAppWindow(hWnd))
                     {
                         uint pid = 0;
                         WinApiUtil.GetWindowThreadProcessId(hWnd, out pid);
                         Process process = Process.GetProcessById((int)pid);
+                        IsInvisibleWin10BackgroundAppWindow(hWnd);
                         TopLevelWindow w = new TopLevelWindow(process.ProcessName, strTitle, (int)hWnd, new MSWindowPlacement(placement), zIndex);
                         mapping.AddMapping(hWnd, new WindowConfiguration(process.ProcessName, new MSWindowPlacement(placement), zIndex), strTitle);
                         zIndex++;
@@ -132,6 +140,79 @@ namespace MicrosoftWindowOperator
                 return mapping;
 
             return null;
+        }
+
+        private bool IsInvisibleWin10BackgroundAppWindow(IntPtr hWnd)
+        {
+            int CloakedVal;
+            int hRes = WinApiUtil.DwmGetWindowAttribute(hWnd, (int)WinApiUtil.DwmWindowAttribute.DWMWA_CLOAKED, out CloakedVal, sizeof(int));
+            return CloakedVal != 0;
+        }
+
+        private bool IsHandleInForeground(IntPtr hWnd)
+        {
+            MappedLayout layout = GetCurrentMappedLayout();
+            layout.SortByZ();
+            return (IntPtr)layout.Mapping[0].Handle == hWnd;
+        }
+
+        private void GetProcessStat(Process process)
+        {
+            using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Process WHERE ProcessId = " + process.Id))
+            {
+                foreach (var result in searcher.Get())
+                {
+                    Console.WriteLine("=========");
+                    
+                    Console.WriteLine("CreationClassName:        " + result["CreationClassName"]);
+                    Console.WriteLine("Caption:                  " + result["Caption"]);
+                    Console.WriteLine("CommandLine:              " + result["CommandLine"]);
+                    Console.WriteLine("CreationDate:             " + result["CreationDate"]);
+                    Console.WriteLine("CSCreationClassName:      " + result["CSCreationClassName"]);
+                    Console.WriteLine("CSName:                   " + result["CSName"]);
+                    Console.WriteLine("Description:              " + result["Description"]);
+                    Console.WriteLine("ExecutablePath:           " + result["ExecutablePath"]);
+                    Console.WriteLine("ExecutionState:           " + result["ExecutionState"]);
+                    Console.WriteLine("Handle:                   " + result["Handle"]);
+                    Console.WriteLine("HandleCount:              " + result["HandleCount"]);
+                    Console.WriteLine("InstallDate:              " + result["InstallDate"]);
+                    Console.WriteLine("KernelModeTime:           " + result["KernelModeTime"]);
+                    Console.WriteLine("MaximumWorkingSetSize:    " + result["MaximumWorkingSetSize"]);
+                    Console.WriteLine("MinimumWorkingSetSize:    " + result["MinimumWorkingSetSize"]);
+                    Console.WriteLine("Name:                     " + result["Name"]);
+                    Console.WriteLine("OSCreationClassName:      " + result["OSCreationClassName"]);
+                    Console.WriteLine("OSName:                   " + result["OSName"]);
+                    Console.WriteLine("OtherOperationCount:      " + result["OtherOperationCount"]);
+                    Console.WriteLine("OtherTransferCount:       " + result["OtherTransferCount"]);
+                    Console.WriteLine("PageFaults:               " + result["PageFaults"]);
+                    Console.WriteLine("PageFileUsage:            " + result["PageFileUsage"]);
+                    Console.WriteLine("ParentProcessId:          " + result["ParentProcessId"]);
+                    Console.WriteLine("PeakPageFileUsage:        " + result["PeakPageFileUsage"]);
+                    Console.WriteLine("PeakVirtualSize:          " + result["PeakVirtualSize"]);
+                    Console.WriteLine("PeakWorkingSetSize:       " + result["PeakWorkingSetSize"]);
+                    Console.WriteLine("Priority:                 " + result["Priority"]);
+                    Console.WriteLine("PrivatePageCount:         " + result["PrivatePageCount"]);
+                    Console.WriteLine("ProcessId:                " + result["ProcessId"]);
+                    Console.WriteLine("QuotaNonPagedPoolUsage:   " + result["QuotaNonPagedPoolUsage"]);
+                    Console.WriteLine("QuotaPagedPoolUsage:      " + result["QuotaPagedPoolUsage"]);
+                    Console.WriteLine("QuotaPeakNonPagedPoolUse: " + result["QuotaPeakNonPagedPoolUsage"]);
+                    Console.WriteLine("QuotaPeakPagedPoolUsage:  " + result["QuotaPeakPagedPoolUsage"]);
+                    Console.WriteLine("ReadOperationCount:       " + result["ReadOperationCount"]);
+                    Console.WriteLine("ReadTransferCount:        " + result["ReadTransferCount"]);
+                    Console.WriteLine("SessionId:                " + result["SessionId"]);
+                    Console.WriteLine("Status:                   " + result["Status"]);
+                    Console.WriteLine("TerminationDate:          " + result["TerminationDate"]);
+                    Console.WriteLine("ThreadCount:              " + result["ThreadCount"]);
+                    Console.WriteLine("UserModeTime:             " + result["UserModeTime"]);
+                    Console.WriteLine("VirtualSize:              " + result["VirtualSize"]);
+                    Console.WriteLine("WindowsVersion:           " + result["WindowsVersion"]);
+                    Console.WriteLine("WorkingSetSize:           " + result["WorkingSetSize"]);
+                    Console.WriteLine("WriteOperationCount:      " + result["WriteOperationCount"]);
+                    Console.WriteLine("WriteTransferCount:       " + result["WriteTransferCount"]);
+                    Console.WriteLine("=========");
+                }
+            }
+
         }
     }
 }

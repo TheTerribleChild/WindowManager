@@ -33,5 +33,10 @@ namespace SystemWindowOperator
             if (Z >= 0)
                 this.Z = Z;
         }
+
+        public override string ToString()
+        {
+            return ApplicationName + "|" + Z + "|" + Placement;
+        }
     }
 }

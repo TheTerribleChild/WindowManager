@@ -37,5 +37,10 @@ namespace SystemWindowOperator
         {
             Mapping.Sort((win1, win2) => win1.Configuration.Z.CompareTo(win2.Configuration.Z));
         }
+
+        public WindowConfiguration[] GetWindowConfigurations()
+        {
+            return (from window in Mapping select window.Configuration).ToArray<WindowConfiguration>();
+        }
     }
 }
