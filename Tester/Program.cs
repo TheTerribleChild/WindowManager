@@ -38,8 +38,8 @@ namespace Tester
                 Console.WriteLine(tlw.ToString());
             }
             */
-            //WindowsManager.WindowManager.Instance.Test();
-
+            WindowsManager.WindowManager.Instance.Test();
+            /*
             IWindowOperator swo = WindowOperatorActivator.CreateWindowOperator();
             MappedLayout layout = swo.GetCurrentMappedLayout();
             foreach (MappedWindow tlw in layout.Mapping)

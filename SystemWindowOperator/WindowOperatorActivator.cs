@@ -23,7 +23,7 @@ namespace SystemWindowOperator
             }
         }
 
-        public static object CreateType<T>()
+        private static object CreateType<T>()
         {
             string[] sourcePackDLLs = Directory.GetFiles(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "WindowOperators"), "*.dll");
 
@@ -49,6 +49,11 @@ namespace SystemWindowOperator
         public static IWindowOperator CreateWindowOperator()
         {
             return CreateType<IWindowOperator>() as IWindowOperator;
+        }
+
+        public static LayoutManager CreateLayoutManager()
+        {
+            return CreateType<LayoutManager>() as LayoutManager;
         }
     }
 }

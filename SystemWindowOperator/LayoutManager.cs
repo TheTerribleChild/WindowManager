@@ -13,7 +13,7 @@ namespace SystemWindowOperator
 
         protected LayoutManager()
         {
-
+            this.LayoutConfigurations = new List<LayoutConfiguration>();
         }
 
         public void AddLayout(LayoutConfiguration layout)

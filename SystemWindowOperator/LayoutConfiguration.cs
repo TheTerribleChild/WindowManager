@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SystemWindowOperator
 {
-    public abstract class LayoutConfiguration
+    public class LayoutConfiguration
     {
         public WindowConfiguration[] WindowConfigurations { get; private set; }
         public HashSet<int> FastMatchingSet { get; private set; }

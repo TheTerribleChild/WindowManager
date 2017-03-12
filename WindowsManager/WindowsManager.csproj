@@ -48,12 +48,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configurations\LayoutConfiguration.cs" />
-    <Compile Include="Configurations\LayoutConfigurationManager.cs" />
     <Compile Include="Configurations\ScreenConfiguration.cs" />
     <Compile Include="Configurations\UsageStat.cs" />
     <Compile Include="Configurations\UserConfiguration.cs" />
-    <Compile Include="Configurations\WindowConfigurationManager.cs" />
     <Compile Include="ProcessManager.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -61,7 +58,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="SessionHwndToConfigurationMapper.cs" />
-    <Compile Include="Configurations\WindowConfiguration.cs" />
     <Compile Include="WindowManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

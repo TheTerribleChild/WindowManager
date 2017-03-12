@@ -60,7 +60,7 @@ namespace MicrosoftWindowOperator
             }
         }
 
-        internal MSWindowPlacement(WinApiUtil.WINDOWPLACEMENT placement)
+        public MSWindowPlacement(WinApiUtil.WINDOWPLACEMENT placement)
         {
             this.Placement = placement;
         }

@@ -114,13 +114,11 @@ namespace MicrosoftWindowOperator
                 try
                 {
 
-                    if (WinApiUtil.IsWindowVisible(hWnd) && string.IsNullOrEmpty(strTitle) == false && vdm.IsWindowOnCurrentVirtualDesktop(hWnd) && WinApiUtil.GetWindowPlacement(hWnd, ref placement) && !IsInvisibleWin10BackgroundAppWindow(hWnd))
+                    if (WinApiUtil.IsWindowVisible(hWnd) && string.IsNullOrEmpty(strTitle) == false && vdm.IsWindowOnCurrentVirtualDesktop(hWnd) && WinApiUtil.GetWindowPlacement(hWnd, ref placement) && !IsCloaked(hWnd))
                     {
                         uint pid = 0;
                         WinApiUtil.GetWindowThreadProcessId(hWnd, out pid);
                         Process process = Process.GetProcessById((int)pid);
-                        IsInvisibleWin10BackgroundAppWindow(hWnd);
-                        TopLevelWindow w = new TopLevelWindow(process.ProcessName, strTitle, (int)hWnd, new MSWindowPlacement(placement), zIndex);
                         mapping.AddMapping(hWnd, new WindowConfiguration(process.ProcessName, new MSWindowPlacement(placement), zIndex), strTitle);
                         zIndex++;
                     }
@@ -142,7 +140,7 @@ namespace MicrosoftWindowOperator
             return null;
         }
 
-        private bool IsInvisibleWin10BackgroundAppWindow(IntPtr hWnd)
+        private bool IsCloaked(IntPtr hWnd)
         {
             int CloakedVal;
             int hRes = WinApiUtil.DwmGetWindowAttribute(hWnd, (int)WinApiUtil.DwmWindowAttribute.DWMWA_CLOAKED, out CloakedVal, sizeof(int));

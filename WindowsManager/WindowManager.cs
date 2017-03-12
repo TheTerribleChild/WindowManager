@@ -13,8 +13,7 @@ namespace WindowsManager
     {
         private static WindowManager instance;
         private IWindowOperator windowOperator;
-        private Configurations.WindowConfigurationManager windowConfigManager;
-        private Configurations.LayoutConfigurationManager layoutConfigManager; 
+        private LayoutManager layoutConfigManager; 
 
         public static WindowManager Instance
         {
@@ -29,46 +28,36 @@ namespace WindowsManager
         private WindowManager()
         {
             //windowOperator = WindowOperatorFactory.CreateWindowOperator();
-            windowConfigManager = Configurations.WindowConfigurationManager.Instance;
-            layoutConfigManager = Configurations.LayoutConfigurationManager.Instance;
+            windowOperator = WindowOperatorActivator.CreateWindowOperator();
+            layoutConfigManager = WindowOperatorActivator.CreateLayoutManager();
         }
 
         public void Test()
         {
+            DateTime start = DateTime.Now;
             LoadConfigurationFromFile();
-            TopLevelWindow[] windows = GetFilteredWindows();
-            Configurations.LayoutConfiguration layoutConfig = new Configurations.LayoutConfiguration(GetWindowConfiguration(GetFilteredWindows()), 0);
-            Configurations.LayoutConfigurationManager.AddLayout(layoutConfig);
+            WindowConfiguration[] windows = GetFilteredWindows();
+            LayoutConfiguration layoutConfig = GetCurrentLayoutConfiguration();
+            layoutConfigManager.AddLayout(layoutConfig);
             SaveConfigurationToFile();
+            DateTime end = DateTime.Now;
+            Console.WriteLine(start - end);
         }
 
-        private Configurations.WindowConfiguration[] GetWindowConfiguration(TopLevelWindow[] windows)
+        private LayoutConfiguration GetCurrentLayoutConfiguration()
         {
-            Configurations.WindowConfiguration[] windowConfigs = new Configurations.WindowConfiguration[windows.Length];
-            for(int i = 0; i < windows.Length; i++)
-                windowConfigs[i] = new Configurations.WindowConfiguration(windows[i] as WindowInfo);
-
-            return windowConfigs;
+            WindowConfiguration[] windows = GetFilteredWindows();            
+            LayoutConfiguration layout = new LayoutConfiguration(windows, 0);
+            return layout;
         }
 
-        private Configurations.LayoutConfiguration GetCurrentLayoutConfiguration()
+        private WindowConfiguration[] GetFilteredWindows()
         {
-            TopLevelWindow[] windows = GetFilteredWindows();
-            Configurations.WindowConfiguration[] windowConfigs = new Configurations.WindowConfiguration[windows.Length];
-            for(int i = 0; i < windows.Length; i++)
-                windowConfigs[i] = new Configurations.WindowConfiguration(windows[i]);
-            
-            Configurations.LayoutConfiguration config = new Configurations.LayoutConfiguration(windowConfigs, 0);
-            return config;
-        }
 
-        private TopLevelWindow[] GetFilteredWindows()
-        {
-            /*
-            TopLevelWindow[] windows = windowOperator.GetTopLevelWindow();
-            List<TopLevelWindow> savedWindows = new List<TopLevelWindow>();
+            WindowConfiguration[] windows = windowOperator.GetCurrentMappedLayout().GetWindowConfigurations();
+            List<WindowConfiguration> savedWindows = new List<WindowConfiguration>();
             int zIndex = 0;
-            foreach(TopLevelWindow window in windows)
+            foreach(WindowConfiguration window in windows)
             {
                 if (IsBlacklisted(window))
                     continue;
@@ -78,11 +67,11 @@ namespace WindowsManager
             }
 
             return savedWindows.ToArray();
-            */
+            
             return null;
         }
 
-        private bool IsBlacklisted(TopLevelWindow window)
+        private bool IsBlacklisted(WindowConfiguration window)
         {
             //Fill with blacklist logic later.
             return false;
@@ -91,22 +80,13 @@ namespace WindowsManager
         private void SaveConfigurationToFile()
         {
             new Thread(delegate () {
-
-                if (!Directory.Exists(Properties.Settings.Default["WorkingDirectory"].ToString()))
-                    Directory.CreateDirectory(Properties.Settings.Default["WorkingDirectory"].ToString());
-
-                Configurations.WindowConfigurationManager.Save();
-                Configurations.LayoutConfigurationManager.Save();
+                layoutConfigManager.Save();
             }).Start();
         }
 
         private bool LoadConfigurationFromFile()
         {
-            if (!Directory.Exists(Properties.Settings.Default["WorkingDirectory"].ToString()))
-                return false;
-
-            Configurations.WindowConfigurationManager.Load();
-            Configurations.LayoutConfigurationManager.Load();
+            layoutConfigManager.Load();
             return true;
         }
     }
